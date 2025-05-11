@@ -26,7 +26,7 @@ class SpotifyClient {
         },
       }
     );
-    return response;
+    return response.data.tracks;
   }
 }
 
