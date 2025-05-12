@@ -9,6 +9,7 @@ export default function App() {
   const [popularSongs, setPopularSongs] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [searchedSongs, setSearchedSongs] = useState();
+  const [page, setPage] = useState(1);
   const isSearchedResult = searchedSongs != null;
   const limit = 20;
 
@@ -38,6 +39,18 @@ export default function App() {
     setIsLoading(false);
   };
 
+  const moveToNext = async () => {
+    const nextPage = page + 1;
+    await searchSongs(nextPage);
+    setPage(nextPage);
+  };
+
+  const moveToPrev = async () => {
+    const prevPage = page - 1;
+    await searchSongs(prevPage);
+    setPage(prevPage);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-white">
       <main className="flex-1 p-8 mb-20">
@@ -53,7 +66,9 @@ export default function App() {
             isLoading={isLoading}
             songs={isSearchedResult ? searchedSongs : popularSongs}
           />
-          {isSearchedResult && <Pagination />}
+          {isSearchedResult && (
+            <Pagination onPrev={moveToPrev} onNext={moveToNext} />
+          )}
         </section>
       </main>
     </div>
