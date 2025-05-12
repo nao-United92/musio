@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { SongList } from './components/SongList';
 import spotify from './lib/spotify';
 import { SearchInput } from './components/SearchInput';
+import { Pagination } from './components/Pagination';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -9,6 +10,7 @@ export default function App() {
   const [keyword, setKeyword] = useState('');
   const [searchedSongs, setSearchedSongs] = useState();
   const isSearchedResult = searchedSongs != null;
+  const limit = 20;
 
   useEffect(() => {
     fetchPopularSongs();
@@ -28,9 +30,10 @@ export default function App() {
     setKeyword(e.target.value);
   };
 
-  const searchSongs = async () => {
+  const searchSongs = async (page) => {
     setIsLoading(true);
-    const result = await spotify.searchSongs(keyword);
+    const offset = parseInt(page) ? (parseInt(page) - 1) * limit : 0;
+    const result = await spotify.searchSongs(keyword, limit, offset);
     setSearchedSongs(result.items);
     setIsLoading(false);
   };
@@ -43,8 +46,14 @@ export default function App() {
         </header>
         <SearchInput onInputChange={handleInputChange} onSubmit={searchSongs} />
         <section>
-          <h2 className="text-2xl font-semibold mb-5">{isSearchedResult ? "Search Results" : "Popular Songs"}</h2>
-          <SongList isLoading={isLoading} songs={isSearchedResult ? searchedSongs : popularSongs} />
+          <h2 className="text-2xl font-semibold mb-5">
+            {isSearchedResult ? 'Search Results' : 'Popular Songs'}
+          </h2>
+          <SongList
+            isLoading={isLoading}
+            songs={isSearchedResult ? searchedSongs : popularSongs}
+          />
+          {isSearchedResult && <Pagination />}
         </section>
       </main>
     </div>
