@@ -3,7 +3,7 @@ import { SongList } from './components/SongList';
 import spotify from './lib/spotify';
 import { SearchInput } from './components/SearchInput';
 import { Pagination } from './components/Pagination';
-import { faArrowUp } from '@fortawesome/free-solid-svg-icons'; // Import faArrowUp
+import { faArrowUp, faSun, faMoon } from '@fortawesome/free-solid-svg-icons'; // Import faArrowUp, faSun, faMoon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Import FontAwesomeIcon
 
 export default function App() {
@@ -20,7 +20,10 @@ export default function App() {
   const [isMoodLoading, setIsMoodLoading] = useState(false);
   const [availableGenres, setAvailableGenres] = useState([]);
   const [recentlyPlayedSongs, setRecentlyPlayedSongs] = useState([]);
+  const [favoriteSongs, setFavoriteSongs] = useState([]); // New state for favorite songs
   const [showScrollButton, setShowScrollButton] = useState(false); // New state for scroll button
+  const [isDarkMode, setIsDarkMode] = useState(false); // New state for dark mode
+  const [searchType, setSearchType] = useState('track'); // New state for search type
 
   const isSearchedResult = searchedSongs != null;
   const limit = 20;
@@ -36,7 +39,28 @@ export default function App() {
     fetchPopularSongs();
     const storedHistory = JSON.parse(localStorage.getItem('recentlyPlayedSongs')) || [];
     setRecentlyPlayedSongs(storedHistory);
+
+    const storedFavorites = JSON.parse(localStorage.getItem('favoriteSongs')) || [];
+    setFavoriteSongs(storedFavorites);
+
+    // Initialize dark mode from localStorage or system preference
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode) {
+      setIsDarkMode(savedMode === 'true');
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setIsDarkMode(true);
+    }
   }, []);
+
+  // Effect to apply dark mode class to HTML element and save preference
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', isDarkMode);
+  }, [isDarkMode]);
 
   // New function to handle scroll event
   const handleScroll = () => {
@@ -80,7 +104,7 @@ export default function App() {
     const newKeyword = e.target.value;
     setKeyword(newKeyword);
     if (newKeyword.trim() !== '') {
-      searchSongs(1, newKeyword); // Search with new keyword and reset page to 1
+      searchSongs(1, newKeyword, searchType); // Search with new keyword and reset page to 1
     } else {
       setSearchedSongs(null); // Clear search results if keyword is empty
       setPage(1);
@@ -93,10 +117,19 @@ export default function App() {
     setPage(1);
   };
 
-  const searchSongs = async (page, searchKeyword = keyword) => {
+  const handleSearchTypeChange = (type) => {
+    setSearchType(type);
+    if (keyword.trim() !== '') {
+      searchSongs(1, keyword, type); // Re-search with new type if keyword exists
+    }
+  };
+
+  const searchSongs = async (page, searchKeyword = keyword, type = searchType) => {
     setIsLoading(true);
     const offset = parseInt(page) ? (parseInt(page) - 1) * limit : 0;
-    const result = await spotify.searchSongs(searchKeyword, limit, offset);
+    const query = type === 'track' ? searchKeyword : `${type}:"${searchKeyword}"`;
+    const result = await spotify.searchSongs(query, limit, offset, type);
+    console.log("Search Result from spotify.searchSongs:", result);
     setHasNext(result.next != null);
     setHasPrev(result.previous != null);
     setSearchedSongs(result.items);
@@ -160,6 +193,20 @@ export default function App() {
     });
   };
 
+  const handleToggleFavorite = (song) => {
+    setFavoriteSongs(prevFavorites => {
+      const isFavorite = prevFavorites.some(favSong => favSong.id === song.id);
+      let newFavorites;
+      if (isFavorite) {
+        newFavorites = prevFavorites.filter(favSong => favSong.id !== song.id);
+      } else {
+        newFavorites = [...prevFavorites, song];
+      }
+      localStorage.setItem('favoriteSongs', JSON.stringify(newFavorites));
+      return newFavorites;
+    });
+  };
+
   // New function to scroll to top
   const scrollToTop = () => {
     window.scrollTo({
@@ -169,16 +216,24 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
       <main className="flex-1 p-8 mb-20">
         <header className="flex justify-between items-center mb-10">
           <h1 className="text-4xl font-bold">Musio</h1>
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white shadow-md"
+          >
+            <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} size="lg" />
+          </button>
         </header>
         <SearchInput
           onInputChange={handleInputChange}
           onSubmit={searchSongs}
           value={keyword}
           onClearInput={handleClearInput}
+          onSearchTypeChange={handleSearchTypeChange}
+          searchType={searchType}
         />
         <section>
           <h2 className="text-2xl font-semibold mb-5">
@@ -189,6 +244,8 @@ export default function App() {
             songs={isSearchedResult ? searchedSongs : popularSongs}
             onArtistClick={handleArtistClick}
             onSongPlay={handleSongPlay}
+            onToggleFavorite={handleToggleFavorite}
+            favoriteSongs={favoriteSongs}
           />
           {isSearchedResult && (
             <Pagination
@@ -225,6 +282,9 @@ export default function App() {
             isLoading={isTimeCapsuleLoading}
             songs={timeCapsuleSongs}
             onArtistClick={handleArtistClick}
+            onSongPlay={handleSongPlay}
+            onToggleFavorite={handleToggleFavorite}
+            favoriteSongs={favoriteSongs}
           />
         </section>
         <section className="mt-10">
@@ -244,6 +304,9 @@ export default function App() {
             isLoading={isMoodLoading}
             songs={moodSongs}
             onArtistClick={handleArtistClick}
+            onSongPlay={handleSongPlay}
+            onToggleFavorite={handleToggleFavorite}
+            favoriteSongs={favoriteSongs}
           />
         </section>
         <section className="mt-10">
@@ -252,6 +315,20 @@ export default function App() {
             isLoading={false} // Always false for local storage
             songs={recentlyPlayedSongs}
             onArtistClick={handleArtistClick}
+            onSongPlay={handleSongPlay}
+            onToggleFavorite={handleToggleFavorite}
+            favoriteSongs={favoriteSongs}
+          />
+        </section>
+        <section className="mt-10">
+          <h2 className="text-2xl font-semibold mb-5">Favorite Songs</h2>
+          <SongList
+            isLoading={false}
+            songs={favoriteSongs}
+            onArtistClick={handleArtistClick}
+            onSongPlay={handleSongPlay}
+            onToggleFavorite={handleToggleFavorite}
+            favoriteSongs={favoriteSongs}
           />
         </section>
       </main>
