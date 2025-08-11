@@ -74,7 +74,7 @@ export function SongList(props) {
               onClick={() => props.onToggleFavorite(song)}
               className="absolute top-2 left-2 bg-gray-800 bg-opacity-75 rounded-full p-2 text-white hover:bg-gray-700 transition-colors"
             >
-              <FontAwesomeIcon icon={faHeart} className={isFavorite ? 'text-red-500' : 'text-white'} />
+              <FontAwesomeIcon icon={faHeart} className={isFavorite ? 'text-pink-500' : 'text-white'} />
             </button>
           </div>
         );

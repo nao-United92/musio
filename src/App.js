@@ -216,7 +216,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+    <div className="flex flex-col min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white">
       <main className="flex-1 p-8 mb-20">
         <header className="flex justify-between items-center mb-10">
           <h1 className="text-4xl font-bold">Musio</h1>
@@ -235,8 +235,8 @@ export default function App() {
           onSearchTypeChange={handleSearchTypeChange}
           searchType={searchType}
         />
-        <section>
-          <h2 className="text-2xl font-semibold mb-5">
+        <section className="bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-semibold mb-6">
             {isSearchedResult ? 'Search Results' : 'Popular Songs'}
           </h2>
           <SongList
@@ -255,8 +255,8 @@ export default function App() {
           )}
         </section>
         {availableGenres.length > 0 && (
-          <section className="mt-10">
-            <h2 className="text-2xl font-semibold mb-5">Explore Genres</h2>
+          <section className="mt-10 bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+            <h2 className="text-2xl font-semibold mb-6">Explore Genres</h2>
             <div className="flex flex-wrap gap-2 mb-5">
               {availableGenres.map((genre) => (
                 <button
@@ -270,8 +270,8 @@ export default function App() {
             </div>
           </section>
         )}
-        <section className="mt-10">
-          <h2 className="text-2xl font-semibold mb-5">Time Capsule</h2>
+        <section className="mt-10 bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-semibold mb-6">Time Capsule</h2>
           <button
             onClick={fetchTimeCapsuleSongs}
             className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mb-5"
@@ -287,8 +287,8 @@ export default function App() {
             favoriteSongs={favoriteSongs}
           />
         </section>
-        <section className="mt-10">
-          <h2 className="text-2xl font-semibold mb-5">Mood Mixer</h2>
+        <section className="mt-10 bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-semibold mb-6">Mood Mixer</h2>
           <div className="flex space-x-4 mb-5">
             {moods.map((mood) => (
               <button
@@ -309,8 +309,8 @@ export default function App() {
             favoriteSongs={favoriteSongs}
           />
         </section>
-        <section className="mt-10">
-          <h2 className="text-2xl font-semibold mb-5">Recently Played</h2>
+        <section className="mt-10 bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-semibold mb-6">Recently Played</h2>
           <SongList
             isLoading={false} // Always false for local storage
             songs={recentlyPlayedSongs}
@@ -320,8 +320,8 @@ export default function App() {
             favoriteSongs={favoriteSongs}
           />
         </section>
-        <section className="mt-10">
-          <h2 className="text-2xl font-semibold mb-5">Favorite Songs</h2>
+        <section className="mt-10 bg-white dark:bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+          <h2 className="text-2xl font-semibold mb-6">Favorite Songs</h2>
           <SongList
             isLoading={false}
             songs={favoriteSongs}
