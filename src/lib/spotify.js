@@ -38,6 +38,16 @@ class SpotifyClient {
     });
     return response.data.tracks;
   }
+
+  async searchSongsByYear(year, limit = 20, offset = 0) {
+    const response = await axios.get('https://api.spotify.com/v1/search', {
+      headers: {
+        Authorization: `Bearer ` + this.token,
+      },
+      params: { q: `year:${year}`, type: 'track', limit, offset },
+    });
+    return response.data.tracks;
+  }
 }
 
 const spotify = await SpotifyClient.initialize();
