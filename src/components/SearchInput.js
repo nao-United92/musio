@@ -8,7 +8,7 @@ export function SearchInput(props) {
         <input
           onChange={props.onInputChange}
           value={props.value}
-          className="bg-gray-700 w-full py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg pr-10"
+          className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white w-full py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg pr-10"
           placeholder="探したい曲を入力してください"
         />
         {props.value && (
@@ -19,6 +19,17 @@ export function SearchInput(props) {
             <FontAwesomeIcon icon={faTimes} />
           </button>
         )}
+      </div>
+      <div className="mt-4">
+        <select
+          onChange={(e) => props.onSearchTypeChange(e.target.value)}
+          value={props.searchType}
+          className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="track">曲名</option>
+          <option value="artist">アーティスト名</option>
+          <option value="album">アルバム名</option>
+        </select>
       </div>
     </section>
   );
