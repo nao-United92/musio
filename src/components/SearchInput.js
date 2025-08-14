@@ -8,7 +8,7 @@ export function SearchInput(props) {
         <input
           onChange={props.onInputChange}
           value={props.value}
-          className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white w-full py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg pr-10"
+          className="bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-white w-full py-3 px-4 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:shadow-xl transition-shadow duration-200 text-lg pr-10"
           placeholder="探したい曲を入力してください"
         />
         {props.value && (
@@ -24,7 +24,7 @@ export function SearchInput(props) {
         <select
           onChange={(e) => props.onSearchTypeChange(e.target.value)}
           value={props.searchType}
-          className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 text-gray-900 dark:text-white py-2 px-3 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:shadow-xl transition-shadow duration-200 mr-2"
         >
           <option value="track">曲名</option>
           <option value="artist">アーティスト名</option>

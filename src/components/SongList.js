@@ -1,9 +1,38 @@
-import { faSpinner, faCopy, faCheck, faHeart } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSpinner,
+  faCopy,
+  faCheck,
+  faHeart,
+  faShareAlt,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { ShareMenu } from './ShareMenu';
 
 export function SongList(props) {
   const [copiedSongId, setCopiedSongId] = useState(null);
+  const [showShareMenu, setShowShareMenu] = useState(null);
+  const shareMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        shareMenuRef.current &&
+        !shareMenuRef.current.contains(event.target) &&
+        !event.target.closest('.share-button')
+      ) {
+        setShowShareMenu(null);
+      }
+    };
+
+    if (showShareMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showShareMenu]);
 
   const handleCopyLink = async (songId, link) => {
     try {
@@ -44,10 +73,12 @@ export function SongList(props) {
     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
       {props.songs.map((song) => {
         const isCopied = copiedSongId === song.id;
-        const isFavorite = props.favoriteSongs.some(favSong => favSong.id === song.id);
+        const isFavorite = props.favoriteSongs.some(
+          (favSong) => favSong.id === song.id
+        );
         return (
           <div
-            className="flex-none cursor-pointer hover:scale-105 transition-transform duration-300 relative"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105 relative"
             key={song.id}
           >
             <a
@@ -62,10 +93,22 @@ export function SongList(props) {
                 className="mb-2 rounded"
               />
             </a>
-            <h3 className="text-lg font-semibold">{song.name}</h3>
-            <p className="text-gray-600 dark:text-gray-400">By <span className="cursor-pointer hover:underline hover:text-[#3B82F6]" onClick={() => props.onArtistClick(song.artists[0].name)}>{song.artists[0].name}</span></p>
+            <div class="p-4">
+              <h3 className="text-lg font-semibold">{song.name}</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                By{' '}
+                <span
+                  className="cursor-pointer hover:underline hover:text-[#3B82F6]"
+                  onClick={() => props.onArtistClick(song.artists[0].name)}
+                >
+                  {song.artists[0].name}
+                </span>
+              </p>
+            </div>
             <button
-              onClick={() => handleCopyLink(song.id, song.external_urls.spotify)}
+              onClick={() =>
+                handleCopyLink(song.id, song.external_urls.spotify)
+              }
               className="absolute top-2 right-2 bg-gray-800 bg-opacity-75 rounded-full p-2 text-white hover:bg-gray-700 transition-colors"
             >
               <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} />
@@ -74,8 +117,20 @@ export function SongList(props) {
               onClick={() => props.onToggleFavorite(song)}
               className="absolute top-2 left-2 bg-gray-800 bg-opacity-75 rounded-full p-2 text-white hover:bg-gray-700 transition-colors"
             >
-              <FontAwesomeIcon icon={faHeart} className={isFavorite ? 'text-pink-500' : 'text-white'} />
+              <FontAwesomeIcon
+                icon={faHeart}
+                className={isFavorite ? 'text-pink-500' : 'text-white'}
+              />
             </button>
+            <button
+              onClick={() =>
+                setShowShareMenu(showShareMenu === song.id ? null : song.id)
+              }
+              className="absolute bottom-2 right-2 bg-gray-800 bg-opacity-75 rounded-full p-2 text-white hover:bg-gray-700 transition-colors share-button"
+            >
+              <FontAwesomeIcon icon={faShareAlt} />
+            </button>
+            {showShareMenu === song.id && <ShareMenu song={song} ref={shareMenuRef} />}
           </div>
         );
       })}
