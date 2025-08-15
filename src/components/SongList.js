@@ -77,44 +77,51 @@ export function SongList(props) {
           (favSong) => favSong.id === song.id
         );
         return (
-          <div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105 relative"
+          <a
+            href={song.external_urls.spotify}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => props.onSongPlay && props.onSongPlay(song)}
+            className="block bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105 relative"
             key={song.id}
           >
-            <a
-              href={song.external_urls.spotify}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => props.onSongPlay && props.onSongPlay(song)}
-            >
-              <img
-                alt="thumbnail"
-                src={song.album.images[0].url}
-                className="mb-2 rounded"
-              />
-            </a>
-            <div class="p-4">
+            <img
+              alt="thumbnail"
+              src={song.album.images[0].url}
+              className="mb-2 rounded"
+            />
+            <div className="p-4">
               <h3 className="text-lg font-semibold">{song.name}</h3>
               <p className="text-gray-600 dark:text-gray-400">
                 By{' '}
                 <span
                   className="cursor-pointer hover:underline hover:text-[#3B82F6]"
-                  onClick={() => props.onArtistClick(song.artists[0].name)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    props.onArtistClick(song.artists[0].name);
+                  }}
                 >
                   {song.artists[0].name}
                 </span>
               </p>
             </div>
             <button
-              onClick={() =>
-                handleCopyLink(song.id, song.external_urls.spotify)
-              }
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleCopyLink(song.id, song.external_urls.spotify);
+              }}
               className="absolute top-2 right-2 bg-gray-800 bg-opacity-75 rounded-full p-2 text-white hover:bg-gray-700 transition-colors"
             >
               <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} />
             </button>
             <button
-              onClick={() => props.onToggleFavorite(song)}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                props.onToggleFavorite(song);
+              }}
               className="absolute top-2 left-2 bg-gray-800 bg-opacity-75 rounded-full p-2 text-white hover:bg-gray-700 transition-colors"
             >
               <FontAwesomeIcon
@@ -123,15 +130,26 @@ export function SongList(props) {
               />
             </button>
             <button
-              onClick={() =>
-                setShowShareMenu(showShareMenu === song.id ? null : song.id)
-              }
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setShowShareMenu(showShareMenu === song.id ? null : song.id);
+              }}
               className="absolute bottom-2 right-2 bg-gray-800 bg-opacity-75 rounded-full p-2 text-white hover:bg-gray-700 transition-colors share-button"
             >
               <FontAwesomeIcon icon={faShareAlt} />
             </button>
-            {showShareMenu === song.id && <ShareMenu song={song} ref={shareMenuRef} />}
-          </div>
+            {showShareMenu === song.id && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+              >
+                <ShareMenu song={song} ref={shareMenuRef} />
+              </div>
+            )}
+          </a>
         );
       })}
     </div>
