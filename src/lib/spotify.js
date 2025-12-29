@@ -2,15 +2,8 @@ import axios from 'axios';
 
 class SpotifyClient {
   static async initialize() {
-    const response = await axios.post(
-      'https://accounts.spotify.com/api/token',
-      {
-        grant_type: 'client_credentials',
-        client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID,
-        client_secret: process.env.REACT_APP_SPOTIFY_CLIENT_SECRET,
-      },
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-    );
+    //  Spotifyに直接ではなく、/api/token にリクエストを送る
+    const response = await axios.get('/api/token');
 
     let spotify = new SpotifyClient();
     spotify.token = response.data.access_token;
