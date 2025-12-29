@@ -355,7 +355,7 @@ export default function App() {
         </section>
       </main>
       <footer className="bg-gray-800 text-white p-4 text-center">
-        <p>Made with ❤️ by Naoya</p>
+        <p>Made with ❤️ by nao-United92</p>
       </footer>
       {showScrollButton && ( // Conditionally render the button
         <button
